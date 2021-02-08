@@ -70,10 +70,14 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    routing {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+    val port = System.getenv("PORT")?.toInt() ?: 23567
+
+    embeddedServer(Netty, port = port) {
+        routing {
+            get("/") {
+                call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+            }
         }
-    }
+    }.start(wait = true)
 }
 
