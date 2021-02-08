@@ -1,1 +1,1 @@
-web: build/install/musiclibrarysusie/bin/musiclibrarysusie
+web: java -jar musiclibrarysusie\build\libs\musiclibrarysusie-0.0.1.jar
