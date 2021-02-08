@@ -1,10 +1,12 @@
 package com.musiclibrarysusie
 
 import io.ktor.application.*
+import io.ktor.http.ContentType
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.response.*
 import io.ktor.request.*
+import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -34,12 +36,14 @@ fun main() {
 //        }
 //    }
 
-    embeddedServer(Netty, port = 8000) {
+    val port = System.getenv("PORT")?.toInt() ?: 23567
+
+    embeddedServer(Netty, port = port) {
 
         routing {
-            //            get("/") {
-//                call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-//            }
+            get("/") {
+                call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+            }
 //
 //            // Static feature. Try to access `/static/ktor_logo.svg`
             static("/static") {
