@@ -16,9 +16,9 @@ version '0.0.1'
 //mainClassName = "io.ktor.server.netty.EngineMain"
 
 mainClassName = 'com.musiclibrarysusie.Application'
-//task stage {
-//    dependsOn installDist
-//}
+task stage {
+    dependsOn installDist
+}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
