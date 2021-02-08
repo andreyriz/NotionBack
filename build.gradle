@@ -1,8 +1,6 @@
 buildscript {
     repositories {
         jcenter()
-        mavenCentral()
-        maven { url "https://jitpack.io" }
     }
     
     dependencies {
@@ -17,17 +15,10 @@ group 'com.musiclibrary-susie'
 version '0.0.1'
 //mainClassName = "io.ktor.server.netty.EngineMain"
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 mainClassName = 'com.musiclibrarysusie.Application'
-task stage {
-    dependsOn installDist
-}
+//task stage {
+//    dependsOn installDist
+//}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
