@@ -46,16 +46,16 @@ fun main() {
             }
 //
 //            // Static feature. Try to access `/static/ktor_logo.svg`
-            static("/static") {
-                resources("static")
-
-                static("musicgenre") {
-
-                }
-                static("musicartist") {
-
-                }
-            }
+//            static("/static") {
+//                resources("static")
+//
+//                static("musicgenre") {
+//
+//                }
+//                static("musicartist") {
+//
+//                }
+//            }
 //
 //            get("/json/gson") {
 //                call.respond(mapOf("hello" to "world"))
