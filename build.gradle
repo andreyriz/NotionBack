@@ -13,7 +13,7 @@ apply plugin: 'application'
 
 group 'com.musiclibrary-susie'
 version '0.0.1'
-mainClassName = "io.ktor.server.netty.EngineMain"
+//mainClassName = "io.ktor.server.netty.EngineMain"
 
 mainClassName = 'com.musiclibrarysusie.Application'
 task stage {
