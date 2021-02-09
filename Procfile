@@ -1,1 +1,1 @@
-web: build/install/musiclibrarysusie/musiclibrarysusie
+web: ./build/install/musiclibrarysusie/musiclibrarysusie
