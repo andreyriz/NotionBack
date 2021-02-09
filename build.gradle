@@ -15,7 +15,7 @@ group 'com.musiclibrarysusie'
 version '0.0.1'
 //mainClassName = "io.ktor.server.netty.EngineMain"
 
-mainClassName = 'com.musiclibrarysusie.Application'
+mainClassName = 'com.musiclibrarysusie.ApplicationKt'
 task stage {
     dependsOn installDist
 }
