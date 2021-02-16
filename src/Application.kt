@@ -1,6 +1,7 @@
 package com.musiclibrarysusie
 
 import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
 import io.ktor.http.ContentType
 import io.ktor.http.content.resources
@@ -11,6 +12,8 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -75,6 +78,45 @@ object Music : Table() {
 //    }.start(wait = true)
 //}
 
+//Host ec2-54-72-155-238.eu-west-1.compute.amazonaws.com
+//Database d9bmg57phrms4f
+//User gwaegjctdegngg
+//Port 5432
+//Password fec810cbc07387ab2b4e1a5080ae3dab0d033d56abddf7f38220bae69321465f
+//URI postgres://gwaegjctdegngg:fec810cbc07387ab2b4e1a5080ae3dab0d033d56abddf7f38220bae69321465f@ec2-54-72-155-238.eu-west-1.compute.amazonaws.com:5432/d9bmg57phrms4f
+
+//dataSourceClassName=org.postgresql.ds.PGSimpleDataSource
+//dataSource.user=<username>
+//dataSource.password=<password>
+//dataSource.databaseName=<dbName>
+//dataSource.portNumber=<serverPort>
+//dataSource.serverName=<serverName>
+
+private fun hikari(): HikariDataSource {
+    val config = HikariConfig()
+    config.driverClassName = System.getenv("JDBC_DRIVER") // 1
+    config.jdbcUrl = System.getenv("DATABASE_URL") // 2
+    config.maximumPoolSize = 3
+    config.isAutoCommit = false
+    config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+    val user = System.getenv("DATABASE_USER") // 3
+    if (user != null) {
+        config.username = user
+    }
+    val password = System.getenv("DATABASE_PASS") // 4
+    if (password != null) {
+        config.password = password
+    }
+    config.validate()
+    return HikariDataSource(config)
+}
+
+// 5
+suspend fun <T> dbQuery(block: () -> T): T =
+    withContext(Dispatchers.IO) {
+        transaction { block() }
+    }
+
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
@@ -82,13 +124,11 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
     val port = System.getenv("PORT")?.toInt() ?: 23567
 
-//    val config = HikariConfig()
-//    config.driverClassName = System.getenv("JDBC_DATABASE_URL")
-
     Database.connect(
-        System.getenv("DATABASE_URL"),
+        hikari()
+        //System.getenv("DATABASE_URL"),
         //"jdbc:postgresql://localhost:5432/MusicDb?user=postgres&password=29091998",
-        driver = "org.postgresql.Driver"
+        //driver = "org.postgresql.Driver"
     )
     //postgres://postgres:29091998@YourHostname:5432/YourDatabaseName , user = "postgres", password = "29091998"
 
@@ -133,24 +173,3 @@ fun Application.module(testing: Boolean = false) {
         }
     }.start(wait = true)
 }
-
-
-//class UserController {
-//
-//    fun getAll(): ArrayList<User> {
-//        val users: ArrayList<User> = arrayListOf()
-//        transaction {
-//            Users.selectAll().map {
-//                users.add(
-//                    User(
-//                        id = it[Public.id],
-//                        firstName = it[Users.firstname],
-//                        lastName = it[Users.lastname],
-//                        age = it[Users.age]
-//                    )
-//                )
-//            }
-//        }
-//        return users
-//    }
-//}
