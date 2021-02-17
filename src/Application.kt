@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.net.URI
 
 //@Suppress("unused") // Referenced in application.conf
 //@kotlin.jvm.JvmOverloads
@@ -94,21 +95,33 @@ object Music : Table() {
 
 private fun hikari(): HikariDataSource {
     val config = HikariConfig()
-    config.driverClassName = "org.postgresql.Driver"
-        //System.getenv("JDBC_DRIVER") // 1
-    config.jdbcUrl = "jdbc:" + System.getenv("DATABASE_URL") // 2
+
+    config.driverClassName = System.getenv("JDBC_DRIVER")
+    var dbUri = URI(System.getenv("DATABASE_URL"))
+    val username = dbUri.userInfo.split(":").toTypedArray()[0]
+    val password = dbUri.userInfo.split(":").toTypedArray()[1]
+    val dbUrl =
+        "jdbc:postgresql://" + dbUri.host + ':' + dbUri.port + dbUri.path + "?sslmode=require" + "&user=$username&password=$password"
+    config.jdbcUrl = dbUrl
     config.maximumPoolSize = 3
     config.isAutoCommit = false
     config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-    val user = System.getenv("DATABASE_USER") // 3
-    if (user != null) {
-        config.username = user
-    }
-    val password = System.getenv("DATABASE_PASS") // 4
-    if (password != null) {
-        config.password = password
-    }
     config.validate()
+//    config.driverClassName = System.getenv("JDBC_DRIVER") // 1
+//    config.jdbcUrl = System.getenv("DATABASE_URL") // 2
+//    config.maximumPoolSize = 3
+//    config.isAutoCommit = false
+//    config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+//    val user = System.getenv("DATABASE_USER") // 3
+//    if (user != null) {
+//        config.username = user
+//    }
+//    val password = System.getenv("DATABASE_PASS") // 4
+//    if (password != null) {
+//        config.password = password
+//    }
+//    config.validate()
+//    return HikariDataSource(config)
     return HikariDataSource(config)
 }
 
