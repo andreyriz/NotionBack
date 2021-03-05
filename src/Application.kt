@@ -70,9 +70,9 @@ fun Application.module(testing: Boolean = false) {
     }
 
     val port = System.getenv("PORT")?.toInt() ?: 23567
-//    Database.connect(
-//        hikari()
-//    )
+    Database.connect(
+        hikari()
+    )
 
     embeddedServer(Netty, port = port) {
         install(ContentNegotiation) {
