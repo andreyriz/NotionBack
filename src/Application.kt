@@ -197,8 +197,8 @@ fun Application.module(testing: Boolean = false) {
                         )
                     }
                 }
-                var serializableMusic = Json.encodeToJsonElement(music)
-                call.respond(serializableMusic)
+                //var serializableMusic = Json.encodeToJsonElement(music)
+                call.respond(music)
             }
 
 //            get("/getArtist") {
