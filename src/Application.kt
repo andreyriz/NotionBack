@@ -3,6 +3,8 @@ package com.musiclibrarysusie
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
+import io.ktor.features.ContentNegotiation
+import io.ktor.gson.gson
 import io.ktor.http.ContentType
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
@@ -14,6 +16,9 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URI
@@ -37,6 +42,13 @@ object Music : Table() {
     val music_source: Column<String> = varchar("music_source", 100)
     override val primaryKey = PrimaryKey(music_id)
 }
+
+@Serializable
+data class SerializableMusic(
+    val music_name: String,
+    val music_img: String,
+    val music_source: String
+)
 
 //
 //fun main() {
@@ -136,25 +148,17 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    val port = System.getenv("PORT")?.toInt() ?: 23567
 
-    Database.connect(
-        hikari()
-        //System.getenv("DATABASE_URL"),
-        //"jdbc:postgresql://localhost:5432/MusicDb?user=postgres&password=29091998",
-        //driver = "org.postgresql.Driver"
-    )
-    //postgres://postgres:29091998@YourHostname:5432/YourDatabaseName , user = "postgres", password = "29091998"
-
-    transaction {
-        SchemaUtils.create(Music)
-
-        Music.insert {
-            it[music_name]="Roket"
-            it[music_img]="https://musiclibrary-susie.herokuapp.com/static/musicartist/roket_main_img.jpg"
-            it[music_source]="https://musiclibrary-susie.herokuapp.com/static/musicsource/rocket-monday.mp3"
+    install(ContentNegotiation) {
+        gson {
+            setPrettyPrinting()
         }
     }
+
+    val port = System.getenv("PORT")?.toInt() ?: 23567
+    Database.connect(
+        hikari()
+    )
 
     embeddedServer(Netty, port = port) {
         routing {
@@ -171,6 +175,9 @@ fun Application.module(testing: Boolean = false) {
                 static("musicsource") {
 
                 }
+                static("musicimagesource") {
+
+                }
             }
 
             get("/") {
@@ -178,12 +185,39 @@ fun Application.module(testing: Boolean = false) {
             }
 
             get("/getArtist") {
-                var users=""
+                var music = ArrayList<SerializableMusic>()
                 transaction {
-                    Music.selectAll().forEach{users+="${it[Music.music_name]} ${it[Music.music_source]} ${it[Music.music_img]}"}
+                    Music.selectAll().forEach {
+                        music.add(
+                            SerializableMusic(
+                                music_name = it[Music.music_name],
+                                music_img = it[Music.music_img],
+                                music_source = it[Music.music_source]
+                            )
+                        )
+                    }
                 }
-                call.respondText(users, contentType = ContentType.Text.Plain)
+                var serializableMusic = Json.encodeToJsonElement(music)
+                call.respond(serializableMusic)
             }
+
+//            get("/getArtist") {
+//                var music:String
+//                transaction {
+//                    //                    Music.selectAll().forEach {
+////                        users.add(
+////                            SerializableMusic(
+////                                music_name = it[Music.music_name],
+////                                music_img = it[Music.music_img],
+////                                music_source = it[Music.music_source]
+////                            )
+////                        )
+////                    }
+//                    //JSON.stringify(Music.selectAll())
+//                    music = Json.encodeToString(Music.selectAll())
+//                }
+//                call.respond(music)
+//            }
         }
     }.start(wait = true)
 }
