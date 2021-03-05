@@ -16,9 +16,6 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URI
@@ -32,7 +29,6 @@ object Music : Table() {
     override val primaryKey = PrimaryKey(music_id)
 }
 
-//@Serializable
 data class SerializableMusic(
     val music_name: String,
     val music_img: String,
@@ -74,11 +70,16 @@ fun Application.module(testing: Boolean = false) {
     }
 
     val port = System.getenv("PORT")?.toInt() ?: 23567
-    Database.connect(
-        hikari()
-    )
+//    Database.connect(
+//        hikari()
+//    )
 
     embeddedServer(Netty, port = port) {
+        install(ContentNegotiation) {
+            gson {
+                setPrettyPrinting()
+            }
+        }
         routing {
 
             static("/static") {
@@ -115,28 +116,8 @@ fun Application.module(testing: Boolean = false) {
                         )
                     }
                 }
-//                var serializableMusic = Json.encodeToJsonElement(music)
-                //call.respond(serializableMusic)
                 call.respond(music)
             }
-
-//            get("/getArtist") {
-//                var music:String
-//                transaction {
-//                    //                    Music.selectAll().forEach {
-////                        users.add(
-////                            SerializableMusic(
-////                                music_name = it[Music.music_name],
-////                                music_img = it[Music.music_img],
-////                                music_source = it[Music.music_source]
-////                            )
-////                        )
-////                    }
-//                    //JSON.stringify(Music.selectAll())
-//                    music = Json.encodeToString(Music.selectAll())
-//                }
-//                call.respond(music)
-//            }
         }
     }.start(wait = true)
 }
