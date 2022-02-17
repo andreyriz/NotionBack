@@ -1,5 +1,6 @@
 package com.musiclibrarysusie
 
+import com.musiclibrarysusie.routes.registerMusicRoutes
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
@@ -9,9 +10,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.get
-import io.ktor.routing.routing
+import io.ktor.routing.*
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.coroutines.Dispatchers
@@ -19,15 +18,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URI
-
-object Music : Table() {
-    val music_id: Column<Int> = integer("music_id").autoIncrement()
-    val music_name: Column<String> = varchar("music_name", 100)
-    val music_img: Column<String> = varchar("music_img", 100)
-    val music_source: Column<String> = varchar("music_source", 100)
-    val year:Column<Int> = integer("year_of_issue")
-    override val primaryKey = PrimaryKey(music_id)
-}
 
 data class SerializableMusic(
     val music_name: String,
@@ -67,6 +57,7 @@ fun Application.module(testing: Boolean = false) {
         gson {
             setPrettyPrinting()
         }
+        registerMusicRoutes()
     }
 
     val port = System.getenv("PORT")?.toInt() ?: 23567
@@ -100,24 +91,42 @@ fun Application.module(testing: Boolean = false) {
             }
 
             get("/") {
-                call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+                call.respondText("Hell", contentType = ContentType.Text.Plain)
             }
 
-            get("/getArtist") {
-                var music = ArrayList<SerializableMusic>()
-                transaction {
-                    Music.selectAll().forEach {
-                        music.add(
-                            SerializableMusic(
-                                music_name = it[Music.music_name],
-                                music_img = it[Music.music_img],
-                                music_source = it[Music.music_source]
-                            )
-                        )
-                    }
-                }
-                call.respond(music)
-            }
+//            get("/getArtist") {
+//                var music = ArrayList<SerializableMusic>()
+//                transaction {
+//                    Music.selectAll().forEach {
+//                        music.add(
+//                            SerializableMusic(
+//                                music_name = it[Music.music_name],
+//                                music_img = it[Music.music_img],
+//                                music_source = it[Music.music_source]
+//                            )
+//                        )
+//                    }
+//                }
+//                call.respond(music)
+//            }
         }
     }.start(wait = true)
+
+    fun Routing.authorization() {
+        route("/auth") {
+            post(){
+
+            }
+
+//            get("/health_check") {
+//                // Check databases/other services.
+//                call.respondText("OK")
+//            }
+//
+//            get("/") {
+//                val loan = Loan(1, 100_000, 1)
+//                call.respond(loan)
+//            }
+        }
+    }
 }
