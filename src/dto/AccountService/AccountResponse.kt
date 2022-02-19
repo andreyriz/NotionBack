@@ -1,4 +1,5 @@
 package com.musiclibrarysusie.dto.AccountService
 
-class AccountResponse {
-}
+data class AccountResponse (
+    val info:String
+    )

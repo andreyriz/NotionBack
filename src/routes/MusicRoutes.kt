@@ -10,7 +10,7 @@ import io.ktor.routing.*
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Route.musicRouting() {
+private fun Route.musicRouting() {
     route("/music") {
 
         post {

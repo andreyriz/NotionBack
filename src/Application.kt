@@ -1,5 +1,6 @@
 package com.musiclibrarysusie
 
+import com.musiclibrarysusie.routes.registerAuthRoutes
 import com.musiclibrarysusie.routes.registerMusicRoutes
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -57,7 +58,6 @@ fun Application.module(testing: Boolean = false) {
         gson {
             setPrettyPrinting()
         }
-        registerMusicRoutes()
     }
 
     val port = System.getenv("PORT")?.toInt() ?: 23567
@@ -72,6 +72,8 @@ fun Application.module(testing: Boolean = false) {
             }
         }
         routing {
+            registerMusicRoutes()
+            registerAuthRoutes()
 
             static("/static") {
                 resources("static")
@@ -94,39 +96,7 @@ fun Application.module(testing: Boolean = false) {
                 call.respondText("Hell", contentType = ContentType.Text.Plain)
             }
 
-//            get("/getArtist") {
-//                var music = ArrayList<SerializableMusic>()
-//                transaction {
-//                    Music.selectAll().forEach {
-//                        music.add(
-//                            SerializableMusic(
-//                                music_name = it[Music.music_name],
-//                                music_img = it[Music.music_img],
-//                                music_source = it[Music.music_source]
-//                            )
-//                        )
-//                    }
-//                }
-//                call.respond(music)
-//            }
         }
     }.start(wait = true)
 
-    fun Routing.authorization() {
-        route("/auth") {
-            post(){
-
-            }
-
-//            get("/health_check") {
-//                // Check databases/other services.
-//                call.respondText("OK")
-//            }
-//
-//            get("/") {
-//                val loan = Loan(1, 100_000, 1)
-//                call.respond(loan)
-//            }
-        }
-    }
 }

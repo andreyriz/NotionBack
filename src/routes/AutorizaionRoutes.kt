@@ -1,32 +1,35 @@
 package com.musiclibrarysusie.routes
 
 import com.musiclibrarysusie.dto.AccountService.AccountRequest
+import com.musiclibrarysusie.dto.AccountService.AccountResponse
+import com.musiclibrarysusie.tables.Accounts
 import io.ktor.application.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Route.authRouting() {
+private fun Route.authRouting() {
     route("/auth") {
 
         post {
-            val musicRequest = call.receive<AccountRequest>()
-//            var response: MusicResponse? = null
-//
-//            transaction {
-//                Music.select {
-//                    Music.music_id eq musicRequest.id
-//                }.limit(1).firstOrNull()?.let {
-//                    response = MusicResponse(
-//                        music_id = it[Music.music_id],
-//                        music_name = it[Music.music_name],
-//                        music_img = it[Music.music_img],
-//                        music_source = it[Music.music_source],
-//                        year = it[Music.year]
-//                    )
-//                }
-//            }
-//
-//            response?.let { it1 -> call.respond(it1) }
+            val authRequest = call.receive<AccountRequest>()
+            var response = AccountResponse("err")
+
+            transaction {
+                Accounts.select {
+                    (Accounts.email eq authRequest.email) and (Accounts.password eq authRequest.password)
+                }.limit(1).firstOrNull()?.let {
+                    response = AccountResponse("Confirm")
+                }
+            }
+
+            //response.let { it1 ->
+                call.respond(response)
+        //}
         }
 
     }
