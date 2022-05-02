@@ -7,6 +7,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 private fun Route.musicRouting() {
@@ -16,23 +17,34 @@ private fun Route.musicRouting() {
             val musicRequest = call.receive<MusicRequest>()
             var response: MusicResponse? = null
 
+            var mmm = ArrayList<Music>()
+
             transaction {
-                Musics.select {
-                    Musics.music_id eq musicRequest.id
-                }.limit(1).firstOrNull()?.let {
-                    response = MusicResponse(
-                        Music(
+                Musics.selectAll().forEach{it-> mmm.add(
+                    Music(
                         music_id = it[Musics.music_id],
                         music_name = it[Musics.music_name],
                         music_img = it[Musics.music_img],
                         music_source = it[Musics.music_source],
                         year = it[Musics.year]
                         )
-                    )
-                }
+                )}
+//                    Musics.music_id eq musicRequest.id
+//                }.limit(1).firstOrNull()?.let {
+//                    response = MusicResponse(
+//                        Music(
+//                        music_id = it[Musics.music_id],
+//                        music_name = it[Musics.music_name],
+//                        music_img = it[Musics.music_img],
+//                        music_source = it[Musics.music_source],
+//                        year = it[Musics.year]
+//                        )
+//                    )
+//
+//                }
             }
 
-            response?.let { it1 -> call.respond(it1) }
+            response?.let { it1 -> call.respond(mmm) }
         }
 
     }
