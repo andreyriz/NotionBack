@@ -37,16 +37,16 @@ private fun Route.musicRouting() {
 
     }
 
-    route("/GetMusicByAlbum") {
-        post{
-            val musicRequest = call.receive<GetMusicByAlbumRequest>()
-            var response:GetMusicByAlbumResponse? = null
-
-            transaction {  }
-
-            response?.let{it->call.respond((it))}
-        }
-    }
+//    route("/GetMusicByAlbum") {
+//        post{
+//            val musicRequest = call.receive<GetMusicByAlbumRequest>()
+//            var response:GetMusicByAlbumResponse? = null
+//
+//            transaction {  }
+//
+//            response?.let{it->call.respond((it))}
+//        }
+//    }
 }
 
 fun Application.registerMusicRoutes() {
