@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 private fun Route.authRouting() {
-    route("/auth") {
+    route("/Auth") {
 
         post {
             val authRequest = call.receive<AccountRequest>()

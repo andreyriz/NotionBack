@@ -5,6 +5,8 @@ import com.musiclibrarysusie.routes.registerMusicRoutes
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
 import io.ktor.http.ContentType
@@ -60,6 +62,12 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+//    install(Authentication){
+//        jwt{
+//
+//        }
+//    }
+
     val port = System.getenv("PORT")?.toInt() ?: 23567
     Database.connect(
         hikari()
@@ -93,7 +101,7 @@ fun Application.module(testing: Boolean = false) {
             }
 
             get("/") {
-                call.respondText("Hell", contentType = ContentType.Text.Plain)
+                call.respondText("1", contentType = ContentType.Text.Plain)
             }
 
         }
