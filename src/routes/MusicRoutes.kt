@@ -44,7 +44,7 @@ private fun Route.musicRouting() {
 //                }
             }
 
-            response?.let { it1 -> call.respond(mmm) }
+            mmm?.let { it1 -> call.respond(mmm) }
         }
 
     }
